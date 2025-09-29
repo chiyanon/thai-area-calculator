@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เครื่องคำนวณและแปลงหน่วยพื้นที่</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+    }
+    .tab-button.active {
+      border-color: #3b82f6;
+      background-color: #3b82f6;
+      color: white;
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-6 md:p-8">
+    
+    <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-6">เครื่องคำนวณและแปลงหน่วยพื้นที่</h1>
+    
+    <!-- Tab Buttons -->
+    <div class="flex border-b border-gray-200 mb-6">
+      <button id="tab-calc-btn" class="tab-button flex-1 py-2 px-4 text-center font-semibold text-gray-600 border-b-2 border-transparent transition-colors duration-300 active" onclick="switchTab('calculator')">
+        คำนวณจากขนาด
+      </button>
+      <button id="tab-conv-btn" class="tab-button flex-1 py-2 px-4 text-center font-semibold text-gray-600 border-b-2 border-transparent transition-colors duration-300" onclick="switchTab('converter')">
+        แปลงหน่วย
+      </button>
+    </div>
+
+    <!-- Calculator Tab -->
+    <div id="calculator-tab">
+      <div class="space-y-4">
+        <div>
+          <label for="unit" class="block text-sm font-medium text-gray-700 mb-1">เลือกหน่วย (Unit)</label>
+          <select id="unit" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <option value="m">เมตร (Meter)</option>
+            <option value="wa">วา (Wah)</option>
+          </select>
+        </div>
+        <div>
+          <label for="width" class="block text-sm font-medium text-gray-700 mb-1">ความกว้าง (Width)</label>
+          <input type="number" id="width" placeholder="กรอกความกว้าง" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div>
+          <label for="height" class="block text-sm font-medium text-gray-700 mb-1">ความยาว (Length)</label>
+          <input type="number" id="height" placeholder="กรอกความยาว" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div class="flex space-x-4">
+          <button id="calculate" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors duration-300">คำนวณ</button>
+          <button id="clear-calc" class="w-full bg-gray-500 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 transition-colors duration-300">ล้างข้อมูล</button>
+        </div>
+      </div>
+      
+      <div id="output" class="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
+        <h3 class="text-lg font-semibold mb-3 text-gray-800">ผลการคำนวณ:</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-gray-700">
+          <div><strong class="font-medium">ไร่:</strong> <span id="res-rai" class="font-mono float-right">0.00</span></div>
+          <div><strong class="font-medium">งาน:</strong> <span id="res-ngan" class="font-mono float-right">0.00</span></div>
+          <div><strong class="font-medium">ตารางวา:</strong> <span id="res-wah" class="font-mono float-right">0.00</span></div>
+          <div><strong class="font-medium">ไร่-งาน-วา:</strong> <span id="res-rai-ngan-wa" class="font-mono float-right">0-0-0.00</span></div>
+          <div><strong class="font-medium">ตารางเมตร:</strong> <span id="res-sqm" class="font-mono float-right">0.00</span></div>
+          <div><strong class="font-medium">ตารางกิโลเมตร:</strong> <span id="res-sqkm" class="font-mono float-right">0.000000</span></div>
+          <div><strong class="font-medium">เฮกตาร์:</strong> <span id="res-hectare" class="font-mono float-right">0.0000</span></div>
+          <div><strong class="font-medium">เอเคอร์:</strong> <span id="res-acre" class="font-mono float-right">0.0000</span></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Converter Tab -->
+    <div id="converter-tab" class="hidden">
+      <p class="text-sm text-gray-600 text-center mb-4">กรอกค่าในช่องใดช่องหนึ่งเพื่อแปลงหน่วยทั้งหมด</p>
+      
+      <div class="space-y-3">
+        <!-- Rai / Ngan / Wa (Decimal) -->
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label for="conv-rai" class="text-sm font-medium text-gray-700">ไร่:</label>
+          <input type="number" id="conv-rai" data-unit="rai" class="converter-input col-span-2 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-right focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label for="conv-ngan" class="text-sm font-medium text-gray-700">งาน:</label>
+          <input type="number" id="conv-ngan" data-unit="ngan" class="converter-input col-span-2 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-right focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label for="conv-tarangWa" class="text-sm font-medium text-gray-700">ตารางวา:</label>
+          <input type="number" id="conv-tarangWa" data-unit="tarangWa" class="converter-input col-span-2 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-right focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        
+        <hr class="my-2">
+        
+        <!-- Rai-Ngan-Wa Compound Input -->
+        <div class="p-3 border border-gray-200 rounded-lg bg-gray-50">
+          <div class="grid grid-cols-4 items-center gap-3">
+            <label class="text-sm font-medium text-gray-700">ไร่-งาน-วา:</label>
+            <input type="number" id="input-rai-compound" placeholder="ไร่" class="thai-unit-input w-full px-2 py-2 border border-gray-300 rounded-md shadow-sm text-center focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <input type="number" id="input-ngan-compound" placeholder="งาน" class="thai-unit-input w-full px-2 py-2 border border-gray-300 rounded-md shadow-sm text-center focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <input type="number" id="input-wa-compound" placeholder="ตร.วา" class="thai-unit-input w-full px-2 py-2 border border-gray-300 rounded-md shadow-sm text-center focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+        
+        <hr class="my-2">
+
+        <!-- Other Units -->
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label for="conv-sqm" class="text-sm font-medium text-gray-700">ตารางเมตร:</label>
+          <input type="number" id="conv-sqm" data-unit="squareMeters" class="converter-input col-span-2 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-right focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div class="grid grid-cols-3 items-center gap-2">
+            <label for="conv-sqkm" class="text-sm font-medium text-gray-700">ตารางกิโลเมตร:</label>
+            <input type="number" id="conv-sqkm" data-unit="squareKm" class="converter-input col-span-2 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-right focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label for="conv-hectare" class="text-sm font-medium text-gray-700">เฮกตาร์:</label>
+          <input type="number" id="conv-hectare" data-unit="hectares" class="converter-input col-span-2 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-right focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label for="conv-acre" class="text-sm font-medium text-gray-700">เอเคอร์:</label>
+          <input type="number" id="conv-acre" data-unit="acres" class="converter-input col-span-2 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-right focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+      </div>
+      <div class="mt-6">
+        <button id="clear-conv" class="w-full bg-gray-500 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 transition-colors duration-300">ล้างข้อมูล</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+    // --- Tab Switching Logic ---
+    const calcTab = document.getElementById('calculator-tab');
+    const convTab = document.getElementById('converter-tab');
+    const calcBtn = document.getElementById('tab-calc-btn');
+    const convBtn = document.getElementById('tab-conv-btn');
+
+    function switchTab(tabName) {
+        if (tabName === 'calculator') {
+            calcTab.classList.remove('hidden');
+            convTab.classList.add('hidden');
+            calcBtn.classList.add('active');
+            convBtn.classList.remove('active');
+        } else {
+            calcTab.classList.add('hidden');
+            convTab.classList.remove('hidden');
+            calcBtn.classList.remove('active');
+            convBtn.classList.add('active');
+        }
+    }
+
+    // --- Area Calculator Logic ---
+    document.getElementById("calculate").addEventListener("click", () => {
+        const unit = document.getElementById("unit").value;
+        const width = parseFloat(document.getElementById("width").value) || 0;
+        const height = parseFloat(document.getElementById("height").value) || 0;
+        
+        if (width === 0 || height === 0) return;
+        
+        const areaSquareWah = (unit === "m") ? (width * height * 0.25) : (width * height);
+
+        const areaMeters = areaSquareWah * 4;
+        const ngan = areaSquareWah / 100;
+        const rai = areaSquareWah / 400;
+        const sqkm = areaMeters / 1e6;
+        const hectare = areaMeters / 10000;
+        const acre = areaMeters / 4046.86;
+
+        const raiVal = Math.floor(rai);
+        const nganVal = Math.floor((rai - raiVal) * 4);
+        const wahVal = (areaSquareWah - (raiVal * 400) - (nganVal * 100));
+        
+        document.getElementById("res-rai").textContent = rai.toFixed(4);
+        document.getElementById("res-ngan").textContent = ngan.toFixed(4);
+        document.getElementById("res-wah").textContent = areaSquareWah.toFixed(2);
+        document.getElementById("res-rai-ngan-wa").textContent = `${raiVal}-${nganVal}-${wahVal.toFixed(2)}`;
+        document.getElementById("res-sqm").textContent = areaMeters.toFixed(2);
+        document.getElementById("res-sqkm").textContent = sqkm.toFixed(6);
+        document.getElementById("res-hectare").textContent = hectare.toFixed(4);
+        document.getElementById("res-acre").textContent = acre.toFixed(4);
+    });
+    
+    document.getElementById("clear-calc").addEventListener("click", () => {
+        document.getElementById("width").value = '';
+        document.getElementById("height").value = '';
+        document.getElementById("res-rai").textContent = '0.00';
+        document.getElementById("res-ngan").textContent = '0.00';
+        document.getElementById("res-wah").textContent = '0.00';
+        document.getElementById("res-rai-ngan-wa").textContent = '0-0-0.00';
+        document.getElementById("res-sqm").textContent = '0.00';
+        document.getElementById("res-sqkm").textContent = '0.000000';
+        document.getElementById("res-hectare").textContent = '0.0000';
+        document.getElementById("res-acre").textContent = '0.0000';
+    });
+
+
+    // --- Area Converter Logic ---
+    const factorsToSqWa = {
+        rai: 400,
+        ngan: 100,
+        tarangWa: 1,
+        squareMeters: 0.25,
+        squareKm: 250000,
+        hectares: 2500,
+        acres: 1011.714,
+    };
+
+    const allConverterInputs = document.querySelectorAll('.converter-input');
+    const inputRaiCompound = document.getElementById('input-rai-compound');
+    const inputNganCompound = document.getElementById('input-ngan-compound');
+    const inputWaCompound = document.getElementById('input-wa-compound');
+    const thaiUnitCompoundInputs = [inputRaiCompound, inputNganCompound, inputWaCompound];
+
+    function updateConverterFields(totalSqWa, sourceElement = null) {
+      if (!isFinite(totalSqWa)) return;
+      
+      // Update single-value fields
+      allConverterInputs.forEach(input => {
+        if (input !== sourceElement) {
+          const unit = input.dataset.unit;
+          const result = totalSqWa / factorsToSqWa[unit];
+          input.value = totalSqWa > 0 ? parseFloat(result.toPrecision(10)).toString() : '';
+        }
+      });
+      
+      // Update compound Rai-Ngan-Wa fields if they were not the source
+      if (!thaiUnitCompoundInputs.includes(sourceElement)) {
+        if (totalSqWa > 0) {
+            const raiVal = Math.floor(totalSqWa / 400);
+            const wahAfterRai = totalSqWa % 400;
+            const nganVal = Math.floor(wahAfterRai / 100);
+            const wahVal = wahAfterRai % 100;
+            
+            inputRaiCompound.value = raiVal > 0 ? raiVal : '';
+            inputNganCompound.value = nganVal > 0 ? nganVal : '';
+            inputWaCompound.value = wahVal > 0 ? parseFloat(wahVal.toPrecision(10)).toString() : '';
+        } else {
+            thaiUnitCompoundInputs.forEach(input => input.value = '');
+        }
+      }
+    }
+
+    // Event listener for single-value inputs
+    allConverterInputs.forEach(input => {
+      input.addEventListener('input', (e) => {
+        const value = parseFloat(e.target.value) || 0;
+        const unit = e.target.dataset.unit;
+        const totalSqWa = value * factorsToSqWa[unit];
+        updateConverterFields(totalSqWa, e.target);
+      });
+    });
+    
+    // Event listener for compound Rai-Ngan-Wa inputs
+    thaiUnitCompoundInputs.forEach(input => {
+      input.addEventListener('input', (e) => {
+        const rai = parseFloat(inputRaiCompound.value) || 0;
+        const ngan = parseFloat(inputNganCompound.value) || 0;
+        const wa = parseFloat(inputWaCompound.value) || 0;
+        const totalSqWa = (rai * 400) + (ngan * 100) + wa;
+        updateConverterFields(totalSqWa, e.target);
+      });
+    });
+
+    document.getElementById("clear-conv").addEventListener("click", () => {
+        allConverterInputs.forEach(input => input.value = '');
+        thaiUnitCompoundInputs.forEach(input => input.value = '');
+    });
+
+</script>
+</body>
+</html>
+
